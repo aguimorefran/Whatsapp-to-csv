@@ -1,9 +1,9 @@
 import datetime
 import sys
 import pandas as pd
+import os
 
 class Message:
-
     def __init__(self, time, username, line, content, isMedia):
         self.time = time
         self.line = line
@@ -19,16 +19,10 @@ class Message:
             "isMedia": self.isMedia
         }
 
-# removes any emoji from the string
 def deEmojify(inputString):
     return inputString.encode('ascii', 'ignore').decode('ascii')
 
-#   Parses a line of message into its different fields
 def parseMsg(input):
-    # 012345678901234567890123456789
-    # 10/10/2018, 19:33 - Cande: hola que tal
-    # 10/10/2018, 19:34 - Fco: bien y tu
-
     line = input.rstrip()
     day = int(line[0:2])
     month = int(line[3:5])
@@ -63,5 +57,4 @@ def readFromFile(filepath):
 
 msgList = readFromFile(sys.argv[1])
 df = pd.DataFrame.from_records([msg.toDict() for msg in msgList])
-
-#TODO: export to csv
+df.to_csv(os.path.splitext(sys.argv[1])[0]+".csv")
