@@ -6,6 +6,7 @@ import datetime
 import sys
 import pandas as pd
 import os
+import emoji
 
 class Message:
     def __init__(self, time, username, line, content, isMedia):
@@ -23,8 +24,8 @@ class Message:
             "isMedia": self.isMedia
         }
 
-def deEmojify(inputString):
-    return inputString.encode('ascii', 'ignore').decode('ascii')
+def remove_emoji(text):
+    return emoji.get_emoji_regexp().sub(u'', text)
 
 def parseMsg(input):
     line = input.rstrip()
@@ -34,14 +35,14 @@ def parseMsg(input):
     hour = int(line[12:14])
     minute = int(line[15:17])
     content = line[20:].split(':')[1].rstrip().lstrip()
-    content = deEmojify(content)
+    content = remove_emoji(content)
     if content == '':
         content = "EMOJI"
-    user = deEmojify(line[20:].split(':')[0]).rstrip()
-    time = datetime.datetime(year, month, day, hour, minute)
-    isMedia = False
-    if content.find("Media omitted"):
-        isMedia = True
+    user = remove_emoji(line[20:].split(':')[0]).rstrip()
+    time = datetime.datetime(year, month, day, hour, minute).isoformat()
+    isMedia = "FALSE"
+    if content == "<Media omitted>":
+        isMedia = "TRUE"
     return Message(time, user, line, content, isMedia)
 
 
@@ -61,4 +62,5 @@ def readFromFile(filepath):
 
 msgList = readFromFile(sys.argv[1])
 df = pd.DataFrame.from_records([msg.toDict() for msg in msgList])
-df.to_csv(os.path.splitext(sys.argv[1])[0]+".csv")
+print(df)
+df.to_csv(os.path.splitext(sys.argv[1])[0]+".csv", index=False)
