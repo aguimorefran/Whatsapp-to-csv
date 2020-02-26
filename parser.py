@@ -1,3 +1,7 @@
+# FRANCISCO AGUILERA MORENO
+# 26/02/2020
+# Parser.py ---> Takes a whatsapp txt conversation, and converts it into a csv dataset
+
 import datetime
 import sys
 import pandas as pd
